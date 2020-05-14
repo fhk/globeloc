@@ -61,6 +61,12 @@ class GlobeLoc:
         n_rows = 180 * num_deci_places
         n_cols = 360 * num_deci_places
         f_df = gpd.read_file(filename)
+        if f_df.crs != 'EPSG:4326':
+            f_df.to_crs('EPSG:4326')
+        f_df['x'] = coords.apply(lambda p: p.x) # Lon
+        f_df['y'] = coords.apply(lambda p: p.y) # Lat
+        f_df['t_x'] = f_df['x'].apply(lambda p: round((p + 180) * num_deci_places), 0)
+        f_df['t_y'] = f_df['y'].apply(lambda p: round((p + 90) * num_deci_places), 0)
 
         if column is not None:
             # assuming we always have less data than then number of cells
@@ -70,10 +76,24 @@ class GlobeLoc:
                         thing,
                         metadata
                 da.init_array = sparse.lil_matrix((n_rows, n_cols), dtype=np.uint8))
-                data_arrays.append(da)
 
+                for ix, row in f_df[f_df['column'] == thing].iterrows():
+                    da[row.t_x, row.t_y] += 1
+
+                data_arrays.append(da)
         else:
-            pass
+            da = DataArray(
+                    self,
+                    "all",
+                    metadata
+            da.init_array = sparse.lil_matrix((n_rows, n_cols), dtype=np.uint8))
+
+            for ix, row in f_df.iterrows():
+                da[row.t_x, row.t_y] += 1
+
+            data_arrays.append(da)
+
+        return 1
 
 
 class DataArray:
