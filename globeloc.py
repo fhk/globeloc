@@ -2,6 +2,8 @@
 """Create the globeloc API and helpers
 """
 
+import uuid
+
 import geopandas as gpd
 from scipy import sparse
 
@@ -25,7 +27,7 @@ class GlobeLoc:
     """
     def __init__(self):
         self.api_key = None
-        self.data_sets = []
+        self.data_sets = {}
         self.data_arrays = []
 
     def __get_item__(self, item):
@@ -35,10 +37,11 @@ class GlobeLoc:
         self.data_arrays = [DataArray(self, sub_item) for sub_item in item]
         return self.data_arrays
 
-    def connect(self, api_key):
+    def connect(self, api_key, url):
         """
         In the future this should do some kind of authentication
         """
+        self.url = url
         self.api_key = api_key
 
     def load(self, unique_id=None):
@@ -46,13 +49,22 @@ class GlobeLoc:
         specify which data set we want to use
         if unique_id is None return all the ids and meta data for that user
         """
-        self.data_sets.append(unique_id)
+        if self.url = 'local':
+            data = sparse.load_npz(f"./data/{unique_id}.npz")
+            da = DataArray(
+                self,
+                )
+            self.data_sets[len(self.data_sets)] = unique_id
 
     def save(self, my_array):
         """
         Push the data to the backend store and return a unique id
         """
-        return "unique_id"
+        if self.url = 'local':
+            unique_id = uuid.uuid1()
+            sparse.save_npz(f'./data/{unique_id}.npz',attribute.tocsr())
+            self.data_sets[len(self.data_sets)] = unique_id
+            return str(unique_id)
 
     def parse(self, filename, column=None, metadata=None):
         """
@@ -100,7 +112,7 @@ class DataArray:
     """
     A specific data set
     """
-    def __init__(self, globeloc, sub_item, metadata):
+    def __init__(self, globeloc, sub_item=None, metadata=None):
         self.metadata = metadata
         self.globeloc = globeloc
         self.sub_item = sub_item
