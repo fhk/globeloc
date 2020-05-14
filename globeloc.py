@@ -22,7 +22,7 @@ class GlobeLoc:
 		data_arrays = []
 
 	def __get_item__(self, item):
-		return DataArray(self)
+		return [DataArray(self, sub_item) for sub_item in item]
 
 	def connect(self, api_key):
 		pass
@@ -38,7 +38,7 @@ class GlobeLoc:
 
 
 class DataArray:
-	def __init__(self, globeloc):
+	def __init__(self, globeloc, sub_item):
 		pass
 
 	def __get_item__(self, item):
