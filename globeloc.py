@@ -4,6 +4,7 @@
 
 import uuid
 
+import numpy as np
 import geopandas as gpd
 from scipy import sparse
 
@@ -29,15 +30,17 @@ class GlobeLoc:
         self.api_key = None
         self.data_sets = {}
         self.data_arrays = []
+        self.attribute_to_array = {}
 
-    def __get_item__(self, item):
+    def __getitem__(self, item):
         """
         Top level key/attribute filtering
         """
-        self.data_arrays = [DataArray(self, sub_item) for sub_item in item]
-        return self.data_arrays
+        if type(item) == str:
+            return self.data_arrays[self.data_sets[self.attribute_to_array[item]]]
 
-    def connect(self, api_key, url):
+
+    def connect(self, api_key=None, url=None):
         """
         In the future this should do some kind of authentication
         """
@@ -49,63 +52,87 @@ class GlobeLoc:
         specify which data set we want to use
         if unique_id is None return all the ids and meta data for that user
         """
-        if self.url = 'local':
+        if self.url == 'local':
             data = sparse.load_npz(f"./data/{unique_id}.npz")
             da = DataArray(
                 self,
                 )
-            self.data_sets[len(self.data_sets)] = unique_id
+            da.init_array(data)
+            self.data_sets[unique_id] = len(self.data_sets)
+            self.data_arrays.append(da)
+
+        else:
+            # TODO: api.globeloc.com
+            # TODO: custom_enterprise.globeloc.com
+            pass
 
     def save(self, my_array):
         """
         Push the data to the backend store and return a unique id
         """
-        if self.url = 'local':
+        if self.url == 'local':
             unique_id = uuid.uuid1()
-            sparse.save_npz(f'./data/{unique_id}.npz',attribute.tocsr())
-            self.data_sets[len(self.data_sets)] = unique_id
+            sparse.save_npz(f'./data/{my_array}.npz',self.data_arrays[self.data_sets[my_array]].array.tocsr())
             return str(unique_id)
+        else:
+            # TODO: api.globeloc.com
+            # TODO: custom_enterprise.globeloc.com
+            pass
 
-    def parse(self, filename, column=None, metadata=None):
+    def parse(self, filename, column=None, sub_category=None, metadata=None):
         """
         Convert the GIS file into the globeloc array format
         """
-        n_rows = 180 * num_deci_places
-        n_cols = 360 * num_deci_places
+        n_rows = 180 * NUM_DECI_PLACES
+        n_cols = 360 * NUM_DECI_PLACES
         f_df = gpd.read_file(filename)
         if f_df.crs != 'EPSG:4326':
             f_df.to_crs('EPSG:4326')
+        coords = f_df.geometry
         f_df['x'] = coords.apply(lambda p: p.x) # Lon
         f_df['y'] = coords.apply(lambda p: p.y) # Lat
-        f_df['t_x'] = f_df['x'].apply(lambda p: round((p + 180) * num_deci_places), 0)
-        f_df['t_y'] = f_df['y'].apply(lambda p: round((p + 90) * num_deci_places), 0)
+        f_df['t_x'] = f_df['x'].apply(lambda p: round((p + 180) * NUM_DECI_PLACES), 0)
+        f_df['t_y'] = f_df['y'].apply(lambda p: round((p + 90) * NUM_DECI_PLACES), 0)
 
+        # Assuming all data is points and that they should be counted in each cell
+        # This will need to be enhance to support geometries and different data stores
         if column is not None:
             # assuming we always have less data than then number of cells
-            for thing in set(f_df['column']):
+            for thing in set(f_df[column]):
+                if filter is not None:
+                    if thing != sub_category:
+                        continue
                 da = DataArray(
                         self,
                         thing,
-                        metadata
-                da.init_array = sparse.lil_matrix((n_rows, n_cols), dtype=np.uint8))
+                        metadata)
+                da.init_array(sparse.lil_matrix((n_rows, n_cols), dtype=np.uint8))
 
-                for ix, row in f_df[f_df['column'] == thing].iterrows():
-                    da[row.t_x, row.t_y] += 1
+                for ix, row in f_df[f_df[column] == thing].iterrows():
+                    # TODO: can this be done directly to the da object?
+                    da.array[row.t_x, row.t_y] += 1
 
-                data_arrays.append(da)
         else:
             da = DataArray(
                     self,
                     "all",
-                    metadata
-            da.init_array = sparse.lil_matrix((n_rows, n_cols), dtype=np.uint8))
+                    metadata)
+            da.init_array(sparse.lil_matrix((n_rows, n_cols), dtype=np.uint8))
 
             for ix, row in f_df.iterrows():
-                da[row.t_x, row.t_y] += 1
+                # TODO: can this be done directly to the da object?
+                da.array[row.t_x, row.t_y] += 1
 
-            data_arrays.append(da)
 
-        return 1
+        self.data_arrays.append(da) # sore this index in the future and add it to data_sets
+        unique_id = str(uuid.uuid1())
+        if sub_category is None:
+            self.attribute_to_array[len(self.data_sets)] = unique_id
+        else:
+            self.attribute_to_array[sub_category] = unique_id
+        self.data_sets[unique_id] = len(self.data_sets) 
+
+        return unique_id
 
 
 class DataArray:
@@ -117,12 +144,12 @@ class DataArray:
         self.globeloc = globeloc
         self.sub_item = sub_item
 
-    def __get_item__(self, item):
+    def __getitem__(self, item):
         """
         This compute will be done remote in the future
         """
-        pass
+        return self.array[item]
 
-    def init_array(array):
+    def init_array(self, array):
         self.array = array
 
