@@ -1,0 +1,267 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is the server for Globeloc.  You can find out more about [globeloc.com](globeloc.com)",
+    "version": "0.0.1",
+    "title": "Globeloc API",
+    "termsOfService": "",
+    "contact": {
+      "email": "contact@globeloc.com"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "host": "api.globeloc.com",
+  "basePath": "/v1",
+  "tags": [
+    {
+      "name": "connect",
+      "description": "Authorize the client"
+    },
+    {
+      "name": "load",
+      "description": "load a data set"
+    },
+    {
+      "name": "save",
+      "description": "save a data set"
+    },
+    {
+      "name": "get_item",
+      "description": "get a slice of data"
+    },
+    {
+      "name": "execute",
+      "description": "run a query, e.g. multiplication"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/connect": {
+      "post": {
+        "tags": [
+          "connect"
+        ],
+        "summary": "Submit your unique api key and register a client",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User unique api key",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserUID"
+            }
+          }
+        ],
+        "responses": {
+          "405": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/load": {
+      "get": {
+        "tags": [
+          "load"
+        ],
+        "summary": "Load a data set",
+        "description": "",
+        "operationId": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Get a data set by its unique id",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Load"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Data not found"
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        }
+      }
+    },
+    "/save": {
+      "get": {
+        "tags": [
+          "save"
+        ],
+        "summary": "Save a data set, by unique_id or get a new one",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Stores data and assignes a unique_id if one is not given, otherwise overwrites.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DataUID"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      }
+    },
+    "/get_item": {
+      "post": {
+        "tags": [
+          "get_item"
+        ],
+        "summary": "Get a subset of a data set 'slice' it",
+        "description": "The API call to get data[,]",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "unique_id for data and slice to get fetched",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Execute"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid Order"
+          }
+        }
+      }
+    },
+    "/execute": {
+      "post": {
+        "tags": [
+          "execute"
+        ],
+        "summary": "execute a single/multi array operation and get the result",
+        "description": "",
+        "operationId": "getOrderById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Stores data and assignes a unique_id if one is not given, otherwise overwrites.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Execute"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/DataUID"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Order noQt found"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "DataUID": {
+      "type": "object",
+      "properties": {
+        "data_id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "UserUID": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "Load": {
+      "type": "object",
+      "properties": {
+        "data_id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "Execute": {
+      "type": "object",
+      "properties": {
+        "data_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "operation": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  }
+}

@@ -1,0 +1,183 @@
+openapi: 3.0.1
+info:
+  title: Globeloc API
+  description: This is the server for Globeloc.  You can find out more about [globeloc.com](globeloc.com)
+  contact:
+    email: contact@globeloc.com
+  license:
+    name: MIT
+  version: 0.0.1
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: https://api.globeloc.com/v1
+- url: http://api.globeloc.com/v1
+tags:
+- name: connect
+  description: Authorize the client
+- name: load
+  description: load a data set
+- name: save
+  description: save a data set
+- name: get_item
+  description: get a slice of data
+- name: execute
+  description: run a query, e.g. multiplication
+paths:
+  /connect:
+    post:
+      tags:
+      - connect
+      summary: Submit your unique api key and register a client
+      operationId: connect_post
+      requestBody:
+        description: User unique api key
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUID'
+        required: true
+      responses:
+        "405":
+          description: Invalid input
+          content: {}
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: swagger_server.controllers.connect_controller
+  /load:
+    get:
+      tags:
+      - load
+      summary: Load a data set
+      operationId: load_get
+      requestBody:
+        description: Get a data set by its unique id
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Load'
+        required: true
+      responses:
+        "400":
+          description: Invalid ID supplied
+          content: {}
+        "404":
+          description: Data not found
+          content: {}
+        "405":
+          description: Validation exception
+          content: {}
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: swagger_server.controllers.load_controller
+  /save:
+    get:
+      tags:
+      - save
+      summary: Save a data set, by unique_id or get a new one
+      description: Multiple status values can be provided with comma separated strings
+      operationId: save_get
+      requestBody:
+        description: Stores data and assignes a unique_id if one is not given, otherwise
+          overwrites.
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/DataUID'
+        required: true
+      responses:
+        "200":
+          description: successful operation
+          content: {}
+        "400":
+          description: Invalid status value
+          content: {}
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: swagger_server.controllers.save_controller
+  /get_item:
+    post:
+      tags:
+      - get_item
+      summary: Get a subset of a data set 'slice' it
+      description: The API call to get data[,]
+      operationId: get_item_post
+      requestBody:
+        description: unique_id for data and slice to get fetched
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Execute'
+        required: true
+      responses:
+        "200":
+          description: successful operation
+          content: {}
+        "400":
+          description: Invalid Order
+          content: {}
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: swagger_server.controllers.get_item_controller
+  /execute:
+    post:
+      tags:
+      - execute
+      summary: execute a single/multi array operation and get the result
+      operationId: get_order_by_id
+      requestBody:
+        description: Stores data and assignes a unique_id if one is not given, otherwise
+          overwrites.
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Execute'
+        required: true
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataUID'
+        "400":
+          description: Invalid ID supplied
+          content: {}
+        "404":
+          description: Order noQt found
+          content: {}
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: swagger_server.controllers.execute_controller
+components:
+  schemas:
+    DataUID:
+      type: object
+      properties:
+        data_id:
+          type: string
+        user_id:
+          type: string
+      example:
+        data_id: data_id
+        user_id: user_id
+    UserUID:
+      type: object
+      properties:
+        user_id:
+          type: string
+    Load:
+      type: object
+      properties:
+        data_id:
+          type: string
+        user_id:
+          type: string
+    Execute:
+      type: object
+      properties:
+        data_ids:
+          type: array
+          items:
+            type: string
+        user_id:
+          type: string
+        operation:
+          type: string
+
