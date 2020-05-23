@@ -4,6 +4,7 @@ import six
 from swagger_server.models.load import Load  # noqa: E501
 from swagger_server import util
 
+from globeloc.server_impl.controllers_impl import Load_impl
 
 def load_get(body):  # noqa: E501
     """Load a data set
@@ -17,4 +18,5 @@ def load_get(body):  # noqa: E501
     """
     if connexion.request.is_json:
         body = Load.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+        Load_impl()
+    return '1'
