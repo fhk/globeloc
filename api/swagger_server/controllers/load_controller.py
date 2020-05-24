@@ -18,5 +18,4 @@ def load_get(body):  # noqa: E501
     """
     if connexion.request.is_json:
         body = Load.from_dict(connexion.request.get_json())  # noqa: E501
-        Load_impl()
-    return '1'
+        return Load_impl(body)

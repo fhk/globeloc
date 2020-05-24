@@ -19,5 +19,5 @@ def save_get(body):  # noqa: E501
     """
     if connexion.request.is_json:
         body = DataUID.from_dict(connexion.request.get_json())  # noqa: E501
-        Save_impl()
+        Save_impl(body)
     return '1'

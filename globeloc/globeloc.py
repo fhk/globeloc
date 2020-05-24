@@ -3,6 +3,8 @@
 """
 
 import uuid
+import requests
+import json
 
 import numpy as np
 import geopandas as gpd
@@ -55,29 +57,36 @@ class GlobeLoc:
         if self.url == 'local':
             data = sparse.load_npz(f"./data/{unique_id}.npz")
             da = DataArray(
-                self,
-                )
+                self
+            )
             da.init_array(data)
             self.data_sets[unique_id] = len(self.data_sets)
             self.data_arrays.append(da)
 
         else:
-            # TODO: api.globeloc.com
-            # TODO: custom_enterprise.globeloc.com
-            pass
+            response = requests.get(f"{self.url}/v1/load", data={"uuid": unique_id})
+            da = DataArray(
+                self
+            )
+            numpy.frombuffer(response["data"])
+            da.init_array(data)
+            self.data_sets[unique_id] = len(self.data_sets)
+            self.data_arrays.append(da)
 
     def save(self, my_array):
         """
         Push the data to the backend store and return a unique id
         """
+        unique_id = uuid.uuid1()
         if self.url == 'local':
-            unique_id = uuid.uuid1()
             sparse.save_npz(f'./data/{my_array}.npz',self.data_arrays[self.data_sets[my_array]].array.tocsr())
             return str(unique_id)
         else:
-            # TODO: api.globeloc.com
-            # TODO: custom_enterprise.globeloc.com
-            pass
+            data = {
+                "uuid": str(unique_id),
+                "data": self.data_arrays[self.data_sets[my_array]].array.tocsr()
+            }
+            response = requests.post(f"{self.url}/v1/save", data=json.dumps(data))
 
     def parse(self, filename, column=None, sub_category=None, metadata=None):
         """
