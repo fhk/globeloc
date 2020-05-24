@@ -5,6 +5,7 @@
 import uuid
 import requests
 import json
+import tempfile
 
 import numpy as np
 import geopandas as gpd
@@ -68,7 +69,10 @@ class GlobeLoc:
             da = DataArray(
                 self
             )
-            numpy.frombuffer(response["data"])
+            tmp = tempfile.TemporaryDirectory()
+            with open(f'{tmp.name}/{unique_id}.npz', 'wb') as load_array:
+                load_array.write(response['files']['saved_array'])
+            data = sparse.load_npz(f"{tmp.name}/{unique_id}.npz")
             da.init_array(data)
             self.data_sets[unique_id] = len(self.data_sets)
             self.data_arrays.append(da)
@@ -79,14 +83,21 @@ class GlobeLoc:
         """
         unique_id = uuid.uuid1()
         if self.url == 'local':
-            sparse.save_npz(f'./data/{my_array}.npz',self.data_arrays[self.data_sets[my_array]].array.tocsr())
+            sparse.save_npz(f'./data/{my_array}.npz', self.data_arrays[self.data_sets[my_array]].array.tocsr())
             return str(unique_id)
         else:
-            data = {
-                "uuid": str(unique_id),
-                "data": self.data_arrays[self.data_sets[my_array]].array.tocsr()
-            }
-            response = requests.post(f"{self.url}/v1/save", data=json.dumps(data))
+            tmp = tempfile.TemporaryDirectory()
+            sparse.save_npz(f'{tmp.name}/{my_array}.npz', self.data_arrays[self.data_sets[my_array]].array.tocsr())
+            with open(f'{tmp.name}/{my_array}.npz', 'rb') as send_array:
+                data = {
+                    "uuid": str(unique_id),
+                    "data": f'{my_array}.npz'
+                }
+                files = {'upload_array': send_array}
+                response = requests.post(
+                    f"{self.url}/v1/save",
+                    data=data,
+                    files=files)
 
     def parse(self, filename, column=None, sub_category=None, metadata=None):
         """
