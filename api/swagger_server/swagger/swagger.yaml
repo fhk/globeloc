@@ -70,19 +70,17 @@ paths:
       x-codegen-request-body-name: body
       x-openapi-router-controller: swagger_server.controllers.load_controller
   /save:
-    get:
+    post:
       tags:
       - save
       summary: Save a data set, by unique_id or get a new one
       description: Multiple status values can be provided with comma separated strings
-      operationId: save_get
+      operationId: save_post
       requestBody:
-        description: Stores data and assignes a unique_id if one is not given, otherwise
-          overwrites.
         content:
-          '*/*':
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/DataUID'
+              $ref: '#/components/schemas/body'
         required: true
       responses:
         "200":
@@ -91,15 +89,14 @@ paths:
         "400":
           description: Invalid status value
           content: {}
-      x-codegen-request-body-name: body
       x-openapi-router-controller: swagger_server.controllers.save_controller
   /get_item:
-    post:
+    get:
       tags:
       - get_item
       summary: Get a subset of a data set 'slice' it
       description: The API call to get data[,]
-      operationId: get_item_post
+      operationId: get_item_get
       requestBody:
         description: unique_id for data and slice to get fetched
         content:
@@ -180,4 +177,21 @@ components:
           type: string
         operation:
           type: string
+    body:
+      required:
+      - files
+      - user_id
+      - uuid
+      properties:
+        files:
+          type: string
+          description: Stores data and assignes a unique_id if one is not given, otherwise
+            overwrites.
+          format: binary
+        user_id:
+          type: string
+          description: user_id
+        uuid:
+          type: string
+          description: uuid
 

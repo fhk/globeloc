@@ -12,9 +12,13 @@ def save_get(body):  # noqa: E501
 
     Multiple status values can be provided with comma separated strings # noqa: E501
 
-    :param body: Stores data and assignes a unique_id if one is not given, otherwise overwrites.
-    :type body: dict | bytes
-
+    :param files: 
+    :type files: strstr
+    :param user_id: 
+    :type user_id: str
+    :param uuid: 
+    :type uuid: str
+    
     :rtype: None
     """
     if connexion.request.is_json:
