@@ -179,11 +179,11 @@ components:
           type: string
     body:
       required:
-      - files
+      - upload_array
       - user_id
       - uuid
       properties:
-        files:
+        upload_array:
           type: string
           description: Stores data and assignes a unique_id if one is not given, otherwise
             overwrites.

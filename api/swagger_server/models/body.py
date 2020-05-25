@@ -14,28 +14,28 @@ class Body(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, files: str=None, user_id: str=None, uuid: str=None):  # noqa: E501
+    def __init__(self, upload_array: str=None, user_id: str=None, uuid: str=None):  # noqa: E501
         """Body - a model defined in Swagger
 
-        :param files: The files of this Body.  # noqa: E501
-        :type files: str
+        :param upload_array: The upload_array of this Body.  # noqa: E501
+        :type upload_array: str
         :param user_id: The user_id of this Body.  # noqa: E501
         :type user_id: str
         :param uuid: The uuid of this Body.  # noqa: E501
         :type uuid: str
         """
         self.swagger_types = {
-            'files': str,
+            'upload_array': str,
             'user_id': str,
             'uuid': str
         }
 
         self.attribute_map = {
-            'files': 'files',
+            'upload_array': 'upload_array',
             'user_id': 'user_id',
             'uuid': 'uuid'
         }
-        self._files = files
+        self._upload_array = upload_array
         self._user_id = user_id
         self._uuid = uuid
 
@@ -51,29 +51,29 @@ class Body(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def files(self) -> str:
-        """Gets the files of this Body.
+    def upload_array(self) -> str:
+        """Gets the upload_array of this Body.
 
         Stores data and assignes a unique_id if one is not given, otherwise overwrites.  # noqa: E501
 
-        :return: The files of this Body.
+        :return: The upload_array of this Body.
         :rtype: str
         """
-        return self._files
+        return self._upload_array
 
-    @files.setter
-    def files(self, files: str):
-        """Sets the files of this Body.
+    @upload_array.setter
+    def upload_array(self, upload_array: str):
+        """Sets the upload_array of this Body.
 
         Stores data and assignes a unique_id if one is not given, otherwise overwrites.  # noqa: E501
 
-        :param files: The files of this Body.
-        :type files: str
+        :param upload_array: The upload_array of this Body.
+        :type upload_array: str
         """
-        if files is None:
-            raise ValueError("Invalid value for `files`, must not be `None`")  # noqa: E501
+        if upload_array is None:
+            raise ValueError("Invalid value for `upload_array`, must not be `None`")  # noqa: E501
 
-        self._files = files
+        self._upload_array = upload_array
 
     @property
     def user_id(self) -> str:

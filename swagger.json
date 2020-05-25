@@ -126,7 +126,7 @@
         "parameters": [
           {
             "in": "formData",
-            "name": "files",
+            "name": "upload_array",
             "description": "Stores data and assignes a unique_id if one is not given, otherwise overwrites.",
             "required": true,
             "type": "file"

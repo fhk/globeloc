@@ -89,15 +89,18 @@ class GlobeLoc:
             tmp = tempfile.TemporaryDirectory()
             sparse.save_npz(f'{tmp.name}/{my_array}.npz', self.data_arrays[self.data_sets[my_array]].array.tocsr())
             with open(f'{tmp.name}/{my_array}.npz', 'rb') as send_array:
-                data = {
+                files = {
+                    'upload_array': send_array,
                     "uuid": str(unique_id),
-                    "data": f'{my_array}.npz'
-                }
-                files = {'upload_array': send_array}
-                response = requests.post(
+                    "data": f'{my_array}.npz',
+                    "user_id": 'test'}
+
+                session = requests.Session()
+                response = session.post(
                     f"{self.url}/v1/save",
-                    data=data,
                     files=files)
+
+                return response
 
     def parse(self, filename, column=None, sub_category=None, metadata=None):
         """
