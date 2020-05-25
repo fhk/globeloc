@@ -7,7 +7,7 @@ from swagger_server import util
 from globeloc.server_impl.controllers_impl import Execute_impl
 
 
-def get_item_post(body):  # noqa: E501
+def get_item_get(body):  # noqa: E501
     """Get a subset of a data set &#x27;slice&#x27; it
 
     The API call to get data[,] # noqa: E501
