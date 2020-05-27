@@ -65,7 +65,7 @@ class GlobeLoc:
             self.data_arrays.append(da)
 
         else:
-            response = requests.get(f"{self.url}/v1/load", data={"uuid": unique_id})
+            response = requests.get(f"{self.url}/v1/load", json={"data_id": unique_id, "user_id": "test"})
             da = DataArray(
                 self
             )

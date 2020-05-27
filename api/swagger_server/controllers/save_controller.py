@@ -3,6 +3,8 @@ import six
 
 from swagger_server import util
 
+from globeloc.server_impl.controllers_impl import Save_impl
+
 
 def save_post(upload_array, user_id, uuid):  # noqa: E501
     """Save a data set, by unique_id or get a new one
@@ -18,4 +20,6 @@ def save_post(upload_array, user_id, uuid):  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+    save = Save_impl(upload_array, user_id, uuid)
+
+    return save.save()
