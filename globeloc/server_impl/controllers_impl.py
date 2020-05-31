@@ -3,6 +3,8 @@ The server endpoint functionality
 """
 import uuid
 
+from flask import Flask, send_from_directory
+
 class Connect_impl():
     def __init__(self, body):
         user_id  = body["user_id"]
@@ -21,11 +23,15 @@ class Save_impl():
             return str(unique_id)
 
 class Load_impl():
-    def __init__(self, body):
-        unique_id = body["uuid"]
-        with open(f"{unique_id}.npz", "rb") as data_array:
-            return {"data": {f"unique_id": data_array}, "meta_data": {"test": 1}}
+    def __init__(self, data_id, user_id):
+        self.data_id = data_id
+        self.user_id = user_id
 
+    def load(self):
+        response = send_from_directory(directory='.', filename=f'{self.data_id}')
+        response.headers['meta_data'] = '{"test": 213}'
+
+        return response
 
 class Execute_impl():
     def __init__(self):

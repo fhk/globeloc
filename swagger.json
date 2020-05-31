@@ -84,7 +84,7 @@
           "application/json"
         ],
         "produces": [
-          "application/json"
+          "multipart/form-data"
         ],
         "parameters": [
           {
