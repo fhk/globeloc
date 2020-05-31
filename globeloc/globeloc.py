@@ -65,13 +65,14 @@ class GlobeLoc:
             self.data_arrays.append(da)
 
         else:
-            response = requests.get(f"{self.url}/v1/load", json={"data_id": unique_id, "user_id": "test"})
+            response = requests.get(f"{self.url}/v1/load", json={"data_id": unique_id, "user_id": "test"}, stream=True)
             da = DataArray(
                 self
             )
             tmp = tempfile.TemporaryDirectory()
             with open(f'{tmp.name}/{unique_id}.npz', 'wb') as load_array:
-                load_array.write(response['files']['saved_array'])
+                for chunk in response.iter_content(chunk_size=128):
+                    load_array.write(chunk)
             data = sparse.load_npz(f"{tmp.name}/{unique_id}.npz")
             da.init_array(data)
             self.data_sets[unique_id] = len(self.data_sets)

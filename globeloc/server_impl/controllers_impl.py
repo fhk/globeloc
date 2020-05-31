@@ -1,6 +1,7 @@
 """
 The server endpoint functionality
 """
+import os
 import uuid
 
 from flask import Flask, send_from_directory
@@ -28,7 +29,7 @@ class Load_impl():
         self.user_id = user_id
 
     def load(self):
-        response = send_from_directory(directory='.', filename=f'{self.data_id}')
+        response = send_from_directory(directory=os.getcwd(), filename=f'{self.data_id}.npz')
         response.headers['meta_data'] = '{"test": 213}'
 
         return response
